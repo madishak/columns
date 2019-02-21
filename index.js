@@ -1,104 +1,91 @@
-let lineValue = document.getElementById('line');
-let inner = document.getElementById('inner');
-let newArr = [];
-let l = [];
+class SortAndDraw  {
+    constructor(numbersString) {
+        this.nums = numbersString;
+        this.arr;
+        this.l = [];
+        this.newDiv;
+        this.container;
+    }
 
+    getArray()  {
+        this.arr = this.nums.split("").map(element => Number(element));
+        return  this.arr;
 
-const getArray = () => {
-    let nums = document.getElementById('input').value;
-    let t = nums.split("");
-    return t;
-}
+    }
 
+    showArray() {
+        return this.drawArray(this.getArray());
+    }
 
-const showInputArray = (arr) => {
-    arr = getArray();
-    arr = arr.map(elem => Number(elem));
-    newArr = [arr, ...newArr];
-    return drawArray(arr)
-}
-
-
-const increaseSort = () => {
-
-    // the right one
-
-    let arr = newArr[0];
-    // let l = [];
-    for (let i = 0; i < arr.length; i++)
-        for (let j = i+1; j < arr.length; j++) {
-
-            if (arr[i] > arr[j]) {
-                l = [arr.indexOf(arr[i]), arr.indexOf(arr[j]), ...l];
-                let temp = arr[i];
-                arr[i] = arr[j];
-                arr[j] = temp;
-
-
-                newArr = [arr, ...newArr];
-                let first = arr[j];
-                let second = arr[i];
-                let d1 = document.getElementById(first);
-                let d2 = document.getElementById(second);
-                let d11 = d1.cloneNode(true);
-                let d22 = d2.cloneNode(true);
-                d2.parentNode.insertBefore(d11, d2);
-                d1.parentNode.insertBefore(d22, d1);
-                d1.parentNode.removeChild(d1);
-                d2.parentNode.removeChild(d2);
-                return arr;
-
-
+    increaseSort() {
+        for (let i = 0; i < this.arr.length - 1; i++) {
+            for (let j = i + 1; j < this.arr.length; j++) {
+                if (this.arr[i] > this.arr[j]) {
+                    [this.arr[i], this.arr[j]] = [this.arr[j], this.arr[i]];
+                    this.l = [i, j, ...this.l];
+                    return this.drawArray(this.arr);
+                }
             }
+        }
 
+    }
+
+    backSort()  {
+        for (let i = 0; i < this.arr.length; i++)
+        {
+            if (this.l.length != 0) {
+                [this.arr[this.l[0]], this.arr[this.l[1]]] = [this.arr[this.l[1]], this.arr[this.l[0]]];
+                this.l.shift(this.l[0]);
+                this.l.shift(this.l[1]);
+                return this.drawArray(this.arr);
+            }
         }
 
 
-}
-
-
-const backSort = () => {
-    let arr = increaseSort();
-
-    for (let i = 0; i < arr.length; i++)
-    {
-
-        let temp = arr[l[0]];
-        arr[l[0]] = arr[l[1]];
-        arr[l[1]] = temp;
-        l.shift(l[0]);
-        l.shift(l[1]);
-
     }
 
-    return arr;
-}
+
+    drawArray(arr) {
+
+        this.container = document.createElement('div');
+        this.container.className = "line__inner";
+        document.body.appendChild(this.container);
+        for (let i = 0; i < arr.length; i++) {
+
+            this.newDiv = document.createElement('div');
+            this.newDiv.innerHTML = arr[i];
+            this.newDiv.id = arr[i];
+            this.newDiv.className = "line";
+            this.container.appendChild(this.newDiv);
+            this.newDiv.style.height = 15 * arr[i]+'px';
+            this.newDiv.style.display = 'block';
+        }
+        document.body.insertBefore(this.container, h1);
 
 
-const drawArray = (arr) => {
-
-    let newDiv;
-
-    for (let i = 0; i < arr.length; i++) {
-        newDiv = document.createElement('div');
-        newDiv.innerHTML = arr[i];
-        newDiv.id = arr[i];
-        newDiv.className = "line";
-        inner.appendChild(newDiv);
-        newDiv.style.height = 15 * arr[i]+'px';
-        newDiv.style.display = 'block';
+        return this.newDiv;
     }
 
-    return newDiv;
 }
 
 
-let inputValue = document.getElementById('input');
-inputValue.addEventListener('change',showInputArray);
+
+
+// let inputValue = document.getElementById('input').value;
+
+let sortAndDraw = new SortAndDraw(input.value);
+
+
+let inputShow = document.getElementById('input');
+inputShow.addEventListener('change', () => sortAndDraw.showArray());
+
 
 let increase = document.getElementById('inc');
-increase.addEventListener('click', increaseSort);
+increase.addEventListener('click',() => sortAndDraw.increaseSort());
+
 
 let decrease = document.getElementById('dec');
-res = decrease.addEventListener("click", backSort);
+decrease.addEventListener('click', () => sortAndDraw.backSort());
+
+
 
