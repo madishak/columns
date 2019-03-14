@@ -3,20 +3,26 @@ class SortAndDraw  {
         this.arr = numberString.split("").map(element => Number(element));
         this.listOfIndexes = [];
         this.changeColumns = {};
+        this.newArr = [];
+
+
     }
 
     increaseSort() {
         let pointer = 1;
+
         while (pointer) {
             pointer = 0;
 
             for (let i = 0; i < this.arr.length; i++) {
 
                 if (this.arr[i] > this.arr[i + 1]) {
-                    [this.arr[i], this.arr[i + 1]] = [this.arr[i + 1], this.arr[i]];
-                    this.listOfIndexes = [i, i + 1, ...this.listOfIndexes];
                     this.changeColumns.first = this.arr[i];
                     this.changeColumns.second = this.arr[i+1];
+                    this.newArr = [this.arr, ...this.newArr];
+                    [this.arr[i], this.arr[i + 1]] = [this.arr[i + 1], this.arr[i]];
+                    this.listOfIndexes = [i, i + 1, ...this.listOfIndexes];
+
                     pointer = 1;
                     return this.arr;
                 }
@@ -24,6 +30,19 @@ class SortAndDraw  {
         }
     }
 
+
+    put() {
+        // let newArr3 = [];
+        // let arr = this.increaseSort();
+        // this.newArr = [arr, ...this.newArr];
+        // newArr3 = [this.increaseSort(), newArr3];
+        // return alert(this.newArr);
+
+        //
+        // this.arrArr = [this.newArr, ...this.arrArr];
+        alert(this.newArr);
+
+    }
 
     backSort() {
         for (let i = 0; i < this.arr.length; i++)
@@ -70,6 +89,38 @@ class SortAndDraw  {
         secondColl.style.right = -secondWidth - 20 + 'px';
     }
 
+    anArray() {
+        let firstWidth = document.getElementById(this.changeColumns.first).offsetWidth;
+        let secondWidth = document.getElementById(this.changeColumns.second).offsetWidth;
+        let firstColl = document.getElementById(this.changeColumns.first);
+        let secondColl = document.getElementById(this.changeColumns.second);
+        firstColl.style.right = secondWidth - 40 + 'px';
+        secondColl.style.right = -firstWidth + 40 + 'px';
+    }
+
+    animArray() {
+        // let firstWidth = document.getElementById(this.changeColumns.first).offsetWidth;
+        // let secondWidth = document.getElementById(this.changeColumns.second).offsetWidth;
+        let firstColl = document.getElementById(this.changeColumns.first);
+        let secondColl = document.getElementById(this.changeColumns.second);
+        firstColl.className = 'line' + 'move_right';
+        secondColl.className = 'line' + 'move_left';
+        firstColl.style.right = 20 + 'px';
+        secondColl.style.left = 20 + 'px';
+        // for (let i = 0; i < this.arr.length; i++) {
+        //     if (this.arr[i] == this.changeColumns.first) {
+        //         firstColl.style.right = this.arr[i] + 7 + 20 + 'px';
+        //     }
+        //     if (this.arr[i] == this.changeColumns.second) {
+        //         secondColl.style.right = this.arr[i] - 7 - 20 + 'px';
+        //     }
+        //     // firstColl.style.right = this.arr[i] + 7 + 20 + 'px';
+        //     //secondColl.style.right = this.arr[i-1] - 7 - 20 + 'px';
+        // }
+
+        //secondColl.style.right = -secondWidth - 20 + 'px';
+    }
+
 
 }
 
@@ -84,9 +135,13 @@ inputShow.addEventListener('change', () => sortAndDraw.drawArray());
 
 
 let increase = document.getElementById('inc');
-increase.addEventListener('click',() => sortAndDraw.animateArray(sortAndDraw.increaseSort()));
+increase.addEventListener('click',() => sortAndDraw.anArray(sortAndDraw.increaseSort()));
 
 
 let decrease = document.getElementById('dec');
-decrease.addEventListener('click', () => sortAndDraw.animateArray(sortAndDraw.backSort()));
+decrease.addEventListener('click', () => sortAndDraw.drawArray(sortAndDraw.backSort()));
+
+
+let ob = document.getElementById('ob');
+ob.addEventListener('click', () => sortAndDraw.put());
 
