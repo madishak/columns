@@ -38,7 +38,7 @@ class Sort {
             for (let i = 0; i < this.arr.length; i++) {
                 if (this.arr[i] > this.arr[i + 1]) {
                     [this.arr[i], this.arr[i + 1]] = [this.arr[i + 1], this.arr[i]];
-                    this.listOfIndexes = [i + 1, i, ...this.listOfIndexes, ];
+                    this.listOfIndexes = [i + 1, i, ...this.listOfIndexes];
                     flag = true;
 
                     this.struct.indexes = this.listOfIndexes;
