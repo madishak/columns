@@ -103,7 +103,7 @@ class Draw {
                 for (let k = 0; k < leftWidths.length; k++) {
                     if (listOfIndexes[j] === k) {
                         columns[listOfIndexes[j]].style.left = leftWidths[k];
-
+                       // columns[listOfIndexes[j]].style.left = columns[i] * 10 + 'px';
 
                     }
                 }
