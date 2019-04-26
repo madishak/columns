@@ -1,15 +1,34 @@
-class SortAndDraw {
+class Sort {
     constructor(numberString) {
         this.numsArr =  numberString.split("").map(element => Number(element));
         this.arr = this.numsArr.slice(0);
-        this.storage = [this.numsArr];
-        this.indSaver = {};
+        this.listOfIndexes = [];
+        this.struct = {"arr": this.arr}
+    }
 
+    arrayAndIndexes(){
+        return this.struct;
     }
+
+
     decreaseSort() {
-        this.arr = this.storage.shift();
-        return this.arr;
+        for (let i = 0; i < this.arr.length; i++)
+        {
+            if (this.listOfIndexes.length !== 0) {
+                [this.arr[this.listOfIndexes[0]], this.arr[this.listOfIndexes[1]]] = [this.arr[this.listOfIndexes[1]], this.arr[this.listOfIndexes[0]]];
+                this.listOfIndexes.shift(this.listOfIndexes[0]);
+                this.listOfIndexes.shift(this.listOfIndexes[1]);
+
+                this.struct.indexes = this.listOfIndexes;
+                this.struct.arr = this.arr;
+
+
+                return this.arr;
+            }
+        }
     }
+
+
 
     increaseSort()  {
 
@@ -19,8 +38,13 @@ class SortAndDraw {
             for (let i = 0; i < this.arr.length; i++) {
                 if (this.arr[i] > this.arr[i + 1]) {
                     [this.arr[i], this.arr[i + 1]] = [this.arr[i + 1], this.arr[i]];
-                    this.storage = [this.arr.slice(0), ...this.storage];
+                    this.listOfIndexes = [i + 1, i, ...this.listOfIndexes, ];
                     flag = true;
+
+                    this.struct.indexes = this.listOfIndexes;
+                    this.struct.arr = this.arr;
+
+
                     return this.arr;
                 }
             }
@@ -30,9 +54,26 @@ class SortAndDraw {
     }
 
 
+
+
+
+}
+
+class Draw {
+    constructor(sequence) {
+        this.arrayAndIndexes = sequence;
+        this.arr = this.arrayAndIndexes.arr;
+
+    }
+
+
+
     drawArray() {
+        const fixedColumnHeight = 15;
+        const columnMargin = 5;
         let container = document.createElement('div');
         container.className = "line__inner";
+        container.id = "line__inner";
         document.body.appendChild(container);
         for (let i = 0; i < this.arr.length; i++) {
 
@@ -41,78 +82,58 @@ class SortAndDraw {
             newDiv.id = this.arr[i];
             newDiv.className = "line";
             container.appendChild(newDiv);
-            newDiv.style.height = 15 * this.arr[i]+'px';
+            newDiv.style.height = fixedColumnHeight * this.arr[i]+'px';
+            newDiv.style.left = i * columnMargin + 'px';
             newDiv.style.display = 'block';
         }
 
     }
 
+    movement() {
+        let listOfIndexes = this.arrayAndIndexes.indexes;   //indexes' stack (sort steps)
 
-    changeNums() {
+        const [...columns] = document.getElementsByClassName('line'); //columns => HTML objects
 
-        if (this.storage.length > 1) {
-            let firstArr  = this.storage[0];
-            let secondArr = this.storage[1];
-            for (let i = 0; i < firstArr.length; i++) {
-                this.indSaver.a1 = firstArr[i];
-                this.indSaver.a2 = firstArr[i+1];
+        const leftWidths = columns.reduce((arr, elem) => [elem.style.left, ...arr], []).reverse();     //columns' left positions
+
+        let copyLeftWidth = leftWidths.slice(0); //leftWidths array's copy
+
+        for (let i = 0; i < columns.length; i++) {
+            for (let j = 0; j < listOfIndexes.length; j++) {
+                for (let k = 0; k < leftWidths.length; k++) {
+                    if (listOfIndexes[j] === k) {
+                        columns[listOfIndexes[j]].style.left = leftWidths[k];
 
 
-
-                for (let j = 0; j < secondArr.length; j++) {
-                    this.indSaver.b1 = secondArr[j];
-                    this.indSaver.b2 = secondArr[j+1];
-
-                    if (this.indSaver.a1 === this.indSaver.b2 && this.indSaver.a2 === this.indSaver.b1)  {
-                        return this.indSaver;
                     }
-
-
                 }
-
             }
+        }
 
 
-        }
-        else  {
-            return "Nothing";
-        }
+
     }
-
-    animate() {
-
-        let firstColl = document.getElementById(this.indSaver.a2);
-        let secondColl = document.getElementById(this.indSaver.a1);
-
-
-        for(let i = 0; i < this.arr.length; i++) {
-
-            firstColl.style.left = i + 28 + 'px';
-            secondColl.style.left = i - 28 + 'px';
-
-
-        }
-    }
-
 
 
 }
 
 let inputValue = document.getElementById('input').value;
 
-let sortAndDraw = new SortAndDraw(inputValue);
+let sort = new Sort(inputValue);
 
+let draw = new Draw(sort.arrayAndIndexes());
 
 let inputShow = document.getElementById('input');
-inputShow.addEventListener('change', () => sortAndDraw.drawArray());
+inputShow.addEventListener('change', () => draw.drawArray());
 
 
 let increase = document.getElementById('inc');
-increase.addEventListener('click',() => sortAndDraw.animate(sortAndDraw.changeNums(sortAndDraw.increaseSort())));
+increase.addEventListener('click',() => draw.movement(sort.increaseSort()));
 
 
 
 let decrease = document.getElementById('dec');
-decrease.addEventListener('click', () => sortAndDraw.animate(sortAndDraw.changeNums(sortAndDraw.decreaseSort())));
+decrease.addEventListener('click', () => draw.drawArray(sort.decreaseSort()));
+
 
 
