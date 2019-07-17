@@ -1,143 +1,76 @@
-class Sort {
-    constructor(numberString) {
-        this.numsArr = numberString.split("").map(element => Number(element));
-        this.arr = this.numsArr.slice(0);
-        this.listOfIndexes = [];
-    }
+import renderHTML from './ui/page.js';
+import Sort from './sort';
+import Draw from './draw';
+import button from "./ui/button"
+import createElement from "./ui/createElement"
 
+import './style.css';
 
-    decreaseSort() {
-        for (let i = 0; i < this.arr.length; i++) {
-            if (this.listOfIndexes.length !== 0) {
-                [this.arr[this.listOfIndexes[0]], this.arr[this.listOfIndexes[1]]] = [this.arr[this.listOfIndexes[1]], this.arr[this.listOfIndexes[0]]];
-                this.listOfIndexes.shift(this.listOfIndexes[0]);
-                this.listOfIndexes.shift(this.listOfIndexes[1]);
-
-                return this.arr;
-            }
-
-        }
-        return this.arr;
-    }
-
-
-    increaseSort() {
-
-        // let flag = true;
-        // while (flag) {
-        //     flag = false;
-
-            for (let i = 0; i < this.arr.length-1; i++) {
-                for (let j = 0; j < this.arr.length-1-i; j++) {
-                    if (this.arr[j+1] < this.arr[j]) {
-                        [this.arr[j+1], this.arr[j]] = [this.arr[j], this.arr[j+1]];
-                        this.listOfIndexes = [j, j + 1, ...this.listOfIndexes];
-                        // flag = true;
-                        return this.arr;
-                    }
-                }
-            }
-        // }
-        return this.arr;
-
-    }
-
-
-}
-
-class Draw {
-    constructor(array) {
-        this.arr = array;
-        this.columnIndexArr = [];
-
-    }
-
-
-    drawArray() {
-
-        const FIXED_COLUMN_HEIGHT = 15;
-
-        const OFFSET = 30;
-
-        let container = document.createElement('div');
-        container.className = "line__inner";
-        container.id = "line__inner";
-
-
-        for (let i = 0; i < this.arr.length; i++) {
-
-            let newDiv = document.createElement('div');
-            newDiv.innerHTML = this.arr[i];
-            newDiv.id = this.arr[i];
-            newDiv.className = "line";
-            this.columnIndexArr.push(i);
-            newDiv.style.height = `${FIXED_COLUMN_HEIGHT * this.arr[i]}px`;
-            newDiv.style.left =  `${i * OFFSET}px`;
-            container.appendChild(newDiv);
-        }
-        document.body.appendChild(container);
-    }
-
-
-    movement(newArr) {
-
-        const bg = {
-            first : 0,
-            second : 1
-        };
-
-
-        const COLUMN_MARGIN = 30;
-
-        const [...columns] = document.getElementsByClassName('line'); //columns => HTML objects
-
-
-        for (let i = 0; i < newArr.length; i++) {
-            if (newArr[i] !== this.arr[i]) {
-                [this.columnIndexArr[i], this.columnIndexArr[i+1]] = [this.columnIndexArr[i+1], this.columnIndexArr[i]];
-                bg.first = this.columnIndexArr[i];
-                bg.second = this.columnIndexArr[i+1];
-
-                break;
-            }
-        }
-        for (let i = 0; i < columns.length; i++) {
-            columns[this.columnIndexArr[i]].style.left = `${i * COLUMN_MARGIN}px`;
-            columns[this.columnIndexArr[i]].style.backgroundColor = 'dodgerblue';
-            columns[bg.first].style.backgroundColor = 'red';
-            columns[bg.second].style.backgroundColor = 'red';
-
-
-        }
-        this.arr = [...newArr];// плохо
-
-    }
-
-
-}
-
+renderHTML();
 
 const inputShow = document.getElementById('input');
-inputShow.addEventListener('change', () => renderCollection());
 
+const strToArray = (str) => {
+    return str.split("").map(element => {
+        let result;
+        Number(element);
 
-const renderCollection = () => {
-    let inputValue = document.querySelector('#input').value;
-    console.log(inputValue);
+        if (isNaN(element)) {
+            result = '';
+        } else {
+            result = element;
+        }
+
+        return result;
+
+    });
+};
+
+inputShow.addEventListener('change', () => {
+    const newArr = strToArray(inputShow.value);
+    return renderCollection(newArr);
+});
+
+const renderCollection = inputValue => {
 
     let sort = new Sort(inputValue);
-
-    let draw = new Draw(sort.arr);
-
-
-    draw.movement(sort.arr);
+    let draw = new Draw(inputValue);
+    sort.increaseSort();
     draw.drawArray();
 
 
-    let decrease = document.getElementById('dec');
-    decrease.addEventListener('click', () => draw.movement(sort.decreaseSort()));
+    const errorMessage = createElement('div', 'error__message', 'Введите цифры, вместо букв');
 
-    let increase = document.getElementById('inc');
-    increase.addEventListener('click', () => draw.movement(sort.increaseSort()));
+    inputValue.forEach(value => {
+        //console.log(value);
+        if (value === '') {
+            return draw.linesButtonsContainer.appendChild(errorMessage);
+
+        }
+
+
+    });
+
+
+    const buttonBack = button("lines__button", "назад", 'dec');
+
+    const buttonNext = button("lines__button", "вперед", 'inc');
+
+
+    buttonBack.addEventListener('click', () => draw.movement(sort.decreaseSort()));
+    buttonNext.addEventListener('click', () => draw.movement(sort.change()));
+
+    const buttonsInner = createElement('div', "lines__button-inner");
+    buttonsInner.append(buttonBack, buttonNext); //experimental technology "Node.append()"
+
+
+    draw.linesButtonsContainer.appendChild(buttonsInner);
+
+
+
+
 
 };
+
+let deleteVal = document.querySelector('#del');
+deleteVal.addEventListener('click', () => (inputShow.value = ''));
